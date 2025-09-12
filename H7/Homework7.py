@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import sklearn.datasets
     
 breast_cancer_data = sklearn.datasets.load_breast_cancer()
+X = breast_cancer_data.data
+y = breast_cancer_data.target
+
 x_train, x_test, y_train, y_test = train_test_split(breast_cancer_data.data, breast_cancer_data.target, test_size=0.2, random_state=42)
 
 def evaluate_model(n_neighbors):
