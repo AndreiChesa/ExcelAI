@@ -1,4 +1,5 @@
 import numpy as np
+from typing import List
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.neighbors import KNeighborsClassifier
@@ -142,4 +143,96 @@ class CrossValidationPart:
         CrossValidationPart.cross_val_test(breast_cancer_data)
         CrossValidationPart.stratified_cross_val_test(breast_cancer_data)
 
-CrossValidationPart.run_tests()
+#CrossValidationPart.run_tests()
+
+class MyOneHotEncoder:
+
+    def __init__(self):
+        self._classes = []
+        self._groups = {}
+
+    def fit(self, data : np.array):
+        self._classes = list(set(data))
+
+        for i, name in enumerate(self._classes):
+            self._groups[name] = i
+
+    def transform(self, data : list):
+        col = len(self._classes) 
+        row = len(data)          
+        result = np.zeros((row,col))
+        for i, name in enumerate(data):
+            column = self._groups[name]
+            result[i][column] = 1
+        
+        return result
+    
+    def fit_transform(self, data : list):
+        self.fit(data)
+        print(self._groups)
+        trans = self.transform(data)
+        print(trans)
+
+    def inverse_transform(self, data: List[List[str]]):
+        invers = []
+        for row in data:
+            for i in range(len(row)):
+                if row[i] == 1:
+                    class_name = self._classes[i]
+                    invers.append(class_name)
+        return invers
+
+        
+    def run_test(self, data: np.array):
+        self.fit_transform(data)
+
+def test_hot():
+    hot_test = MyOneHotEncoder()
+
+    hot_test.run_test([
+        "ana", "are", "mere", "ana"
+    ])
+
+    print(hot_test.inverse_transform([
+        [0, 0, 1],[1,0,0],[0,1,0],[0,0,1] 
+    ]))
+
+class MyLaberEncoder:
+
+    def __init__(self):
+        self._classes = []
+        self._groups = {}
+
+    def fit(self, data : np.array):
+        self._classes = list(set(data))
+
+        for i, name in enumerate(self._classes):
+            self._groups[name] = i
+
+    def transform(self, data : list):
+        result = []
+        for i in data:
+            result.append(self._groups[i])
+        return result
+    
+    def fit_transform(self, data : list):
+        self.fit(data)
+        print(self.transform(data))
+
+    def inverse_transform(self, data: list):
+        result = []
+        for i in data:
+            result.append(self._classes[i])
+        return result
+        
+    def run_test(self, data: np.array):
+        self.fit_transform(data)
+
+def test_label():
+    label_test = MyLaberEncoder()
+
+    label_test.run_test([
+        "ana", "are", "mere", "ana"
+    ])
+
+    print(label_test.inverse_transform([0,1,2,0]))
